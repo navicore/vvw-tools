@@ -22,54 +22,44 @@ vvw decode output.wav
 
 ## Commands
 
-### encode
+### encode / decode
 
-Embed text or audio into a WAV file.
+Embed and extract text from WAV files.
 
 ```bash
 # Basic text embedding
 vvw encode input.wav -o output.wav --message "secret message"
-vvw encode input.wav -o output.wav --message-file secret.txt
+vvw decode output.wav
 
-# Embed audio
-vvw encode input.wav -o output.wav --audio hidden.wav
+# From a file
+vvw encode input.wav -o output.wav --message-file secret.txt
+vvw decode output.wav
 
 # Symmetric encryption (passphrase)
 vvw encode input.wav -o output.wav --message "secret" --passphrase "puzzle"
+vvw decode output.wav --passphrase "puzzle"
 
 # Asymmetric encryption (public key)
 vvw encode input.wav -o output.wav --message "secret" --encrypt-to alice.pub
+vvw decode output.wav --key alice.priv
 
-# Multi-recipient
+# Multi-recipient encryption
 vvw encode input.wav -o output.wav --message "secret" \
     --encrypt-to alice.pub --encrypt-to bob.pub
+vvw decode output.wav --key alice.priv   # Either recipient can decrypt
+vvw decode output.wav --key bob.priv
 
-# Sign the message
+# Signed message
 vvw encode input.wav -o output.wav --message "verified" --sign --key my.priv
+vvw decode output.wav --verify my.pub
 
-# Use metadata method (stores in RIFF chunk, not hidden but preserves audio)
+# Metadata method (stores in RIFF chunk, not hidden but preserves audio)
 vvw encode input.wav -o output.wav --message "data" --method metadata
+vvw decode output.wav
 
 # LSB options
 vvw encode input.wav -o output.wav --message "data" --bits 2 --channels left
-```
-
-### decode
-
-Extract text content from a WAV file.
-
-```bash
-# Basic extraction
 vvw decode output.wav
-
-# Decrypt with passphrase
-vvw decode output.wav --passphrase "puzzle"
-
-# Decrypt with private key
-vvw decode output.wav --key my.priv
-
-# Verify signature
-vvw decode output.wav --verify alice.pub
 ```
 
 ### play
