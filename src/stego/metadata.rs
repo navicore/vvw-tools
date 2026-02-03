@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::Path;
 
-const CHUNK_ID: &[u8; 4] = b"vvwD";
+const CHUNK_ID: &[u8; 4] = b"zimH";
 
 pub struct MetadataSteganography;
 
@@ -76,7 +76,7 @@ impl StegoMethod for MetadataSteganography {
             return Err(anyhow!("Not a valid WAV file"));
         }
 
-        // Remove existing vvwD chunk if present
+        // Remove existing zimH chunk if present
         let mut clean_contents = Vec::new();
         clean_contents.extend_from_slice(&contents[0..12]);
 
@@ -100,7 +100,7 @@ impl StegoMethod for MetadataSteganography {
             pos += chunk_total;
         }
 
-        // Create new vvwD chunk
+        // Create new zimH chunk
         let chunk_size = data.len() as u32;
         let mut chunk = Vec::with_capacity(8 + data.len() + (data.len() % 2));
         chunk.extend_from_slice(CHUNK_ID);
@@ -133,7 +133,7 @@ impl StegoMethod for MetadataSteganography {
             file.read_exact(&mut data)?;
             Ok(data)
         } else {
-            Err(anyhow!("No vvwD chunk found in WAV file"))
+            Err(anyhow!("No zimH chunk found in WAV file"))
         }
     }
 

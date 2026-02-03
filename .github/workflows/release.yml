@@ -65,25 +65,25 @@ jobs:
       - name: Build static binary
         run: |
           cargo build --release --target x86_64-unknown-linux-musl
-          strip target/x86_64-unknown-linux-musl/release/vvw
+          strip target/x86_64-unknown-linux-musl/release/zimhide
 
       - name: Verify static linking
         run: |
-          if readelf -d target/x86_64-unknown-linux-musl/release/vvw 2>/dev/null | grep -q "NEEDED"; then
+          if readelf -d target/x86_64-unknown-linux-musl/release/zimhide 2>/dev/null | grep -q "NEEDED"; then
             echo "ERROR: Binary has dynamic dependencies!"
-            readelf -d target/x86_64-unknown-linux-musl/release/vvw | grep NEEDED
+            readelf -d target/x86_64-unknown-linux-musl/release/zimhide | grep NEEDED
             exit 1
           fi
           echo "✓ Binary is statically linked"
 
       - name: Rename binary
-        run: mv target/x86_64-unknown-linux-musl/release/vvw target/x86_64-unknown-linux-musl/release/vvw-linux-x86_64
+        run: mv target/x86_64-unknown-linux-musl/release/zimhide target/x86_64-unknown-linux-musl/release/zimhide-linux-x86_64
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vvw-linux-x86_64
-          path: target/x86_64-unknown-linux-musl/release/vvw-linux-x86_64
+          name: zimhide-linux-x86_64
+          path: target/x86_64-unknown-linux-musl/release/zimhide-linux-x86_64
 
   build-macos-arm64:
     name: Build macOS (ARM64)
@@ -100,13 +100,13 @@ jobs:
         run: cargo build --release
 
       - name: Rename binary
-        run: mv target/release/vvw target/release/vvw-macos-arm64
+        run: mv target/release/zimhide target/release/zimhide-macos-arm64
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vvw-macos-arm64
-          path: target/release/vvw-macos-arm64
+          name: zimhide-macos-arm64
+          path: target/release/zimhide-macos-arm64
 
   build-macos-x86_64:
     name: Build macOS (x86_64)
@@ -124,13 +124,13 @@ jobs:
         run: cargo build --release
 
       - name: Rename binary
-        run: mv target/release/vvw target/release/vvw-macos-x86_64
+        run: mv target/release/zimhide target/release/zimhide-macos-x86_64
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vvw-macos-x86_64
-          path: target/release/vvw-macos-x86_64
+          name: zimhide-macos-x86_64
+          path: target/release/zimhide-macos-x86_64
 
   upload-release:
     name: Upload Release Binaries
@@ -166,8 +166,8 @@ jobs:
             ### Installation
 
             ```bash
-            chmod +x vvw-*
-            mv vvw-* /usr/local/bin/vvw
+            chmod +x zimhide-*
+            mv zimhide-* /usr/local/bin/zimhide
             ```
 
             ### macOS Quarantine
@@ -175,7 +175,7 @@ jobs:
             macOS quarantines unsigned binaries. After downloading, remove the quarantine:
 
             ```bash
-            xattr -d com.apple.quarantine ./vvw-macos-*
+            xattr -d com.apple.quarantine ./zimhide-macos-*
             ```
 
         env:

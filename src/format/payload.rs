@@ -1,6 +1,6 @@
 use anyhow::{Result, anyhow};
 
-pub const MAGIC: &[u8; 4] = b"VVW\x01";
+pub const MAGIC: &[u8; 4] = b"ZIMH";
 pub const SIGNATURE_SIZE: usize = 64;
 
 #[derive(Debug, Clone, Copy, Default)]
@@ -95,7 +95,7 @@ impl Header {
         }
 
         if &bytes[0..4] != MAGIC {
-            return Err(anyhow!("Invalid magic bytes - not a VVW file"));
+            return Err(anyhow!("Invalid magic bytes - not a zimhide file"));
         }
 
         let flags = Flags::from_byte(bytes[4]);

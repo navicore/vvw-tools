@@ -9,8 +9,8 @@ mod stego;
 mod wav;
 
 #[derive(Parser)]
-#[command(name = "vvw")]
-#[command(about = "WAV steganography toolkit for embedding and extracting encrypted content")]
+#[command(name = "zimhide")]
+#[command(about = "Zim Steganography Toolkit - embed and extract encrypted content in WAV files")]
 #[command(version)]
 pub struct Cli {
     #[command(subcommand)]

@@ -107,7 +107,7 @@ fn try_extract(args: &PlayArgs) -> Result<Vec<u8>> {
     let metadata_stego = MetadataSteganography::new();
     if let Ok(data) = metadata_stego.extract(&args.input)
         && data.len() >= 4
-        && &data[0..4] == b"VVW\x01"
+        && &data[0..4] == b"ZIMH"
     {
         return Ok(data);
     }
@@ -120,11 +120,11 @@ fn try_extract(args: &PlayArgs) -> Result<Vec<u8>> {
     let lsb_stego = LsbSteganography::new(options);
     let data = lsb_stego.extract(&args.input)?;
 
-    if data.len() >= 4 && &data[0..4] == b"VVW\x01" {
+    if data.len() >= 4 && &data[0..4] == b"ZIMH" {
         return Ok(data);
     }
 
-    Err(anyhow!("No valid VVW data found in file"))
+    Err(anyhow!("No valid zimhide data found in file"))
 }
 
 fn find_player(preferred: &str) -> Result<String> {

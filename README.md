@@ -1,6 +1,6 @@
-# VVW - WAV Steganography Toolkit
+# Zim Steganography Toolkit (zimhide)
 
-A Rust CLI for embedding and extracting encrypted text and audio in WAV files.
+A Rust CLI for embedding and extracting encrypted text and audio in WAV files. Part of the Zim tool family.
 
 ## Installation
 
@@ -8,16 +8,16 @@ A Rust CLI for embedding and extracting encrypted text and audio in WAV files.
 cargo build --release
 ```
 
-The binary will be at `target/release/vvw`.
+The binary will be at `target/release/zimhide`.
 
 ## Quick Start
 
 ```bash
 # Embed a message
-vvw encode input.wav -o output.wav --message "Hello, world!"
+zimhide encode input.wav -o output.wav --message "Hello, world!"
 
 # Extract the message
-vvw decode output.wav
+zimhide decode output.wav
 ```
 
 ## Commands
@@ -28,38 +28,38 @@ Embed and extract text from WAV files.
 
 ```bash
 # Basic text embedding
-vvw encode input.wav -o output.wav --message "secret message"
-vvw decode output.wav
+zimhide encode input.wav -o output.wav --message "secret message"
+zimhide decode output.wav
 
 # From a file
-vvw encode input.wav -o output.wav --message-file secret.txt
-vvw decode output.wav
+zimhide encode input.wav -o output.wav --message-file secret.txt
+zimhide decode output.wav
 
 # Symmetric encryption (passphrase)
-vvw encode input.wav -o output.wav --message "secret" --passphrase "puzzle"
-vvw decode output.wav --passphrase "puzzle"
+zimhide encode input.wav -o output.wav --message "secret" --passphrase "puzzle"
+zimhide decode output.wav --passphrase "puzzle"
 
 # Asymmetric encryption (public key)
-vvw encode input.wav -o output.wav --message "secret" --encrypt-to alice.pub
-vvw decode output.wav --key alice.priv
+zimhide encode input.wav -o output.wav --message "secret" --encrypt-to alice.pub
+zimhide decode output.wav --key alice.priv
 
 # Multi-recipient encryption
-vvw encode input.wav -o output.wav --message "secret" \
+zimhide encode input.wav -o output.wav --message "secret" \
     --encrypt-to alice.pub --encrypt-to bob.pub
-vvw decode output.wav --key alice.priv   # Either recipient can decrypt
-vvw decode output.wav --key bob.priv
+zimhide decode output.wav --key alice.priv   # Either recipient can decrypt
+zimhide decode output.wav --key bob.priv
 
 # Signed message
-vvw encode input.wav -o output.wav --message "verified" --sign --key my.priv
-vvw decode output.wav --verify my.pub
+zimhide encode input.wav -o output.wav --message "verified" --sign --key my.priv
+zimhide decode output.wav --verify my.pub
 
 # Metadata method (stores in RIFF chunk, not hidden but preserves audio)
-vvw encode input.wav -o output.wav --message "data" --method metadata
-vvw decode output.wav
+zimhide encode input.wav -o output.wav --message "data" --method metadata
+zimhide decode output.wav
 
 # LSB options
-vvw encode input.wav -o output.wav --message "data" --bits 2 --channels left
-vvw decode output.wav
+zimhide encode input.wav -o output.wav --message "data" --bits 2 --channels left
+zimhide decode output.wav
 ```
 
 ### play
@@ -68,14 +68,14 @@ Extract and play embedded audio.
 
 ```bash
 # Play embedded audio
-vvw play output.wav
+zimhide play output.wav
 
 # Extract to file instead
-vvw play output.wav --extract-to recovered.wav
+zimhide play output.wav --extract-to recovered.wav
 
 # With decryption
-vvw play output.wav --passphrase "puzzle"
-vvw play output.wav --key my.priv
+zimhide play output.wav --passphrase "puzzle"
+zimhide play output.wav --key my.priv
 ```
 
 ### keygen
@@ -84,11 +84,11 @@ Generate a keypair for encryption and signing.
 
 ```bash
 # Save to files
-vvw keygen --output mykey
+zimhide keygen --output mykey
 # Creates: mykey.pub and mykey.priv
 
 # Output to stdout
-vvw keygen
+zimhide keygen
 ```
 
 ### inspect
@@ -96,10 +96,10 @@ vvw keygen
 Show embedded content metadata without decrypting.
 
 ```bash
-vvw inspect output.wav
+zimhide inspect output.wav
 
 # Example output:
-# VVW Embedded Data
+# Zimhide Embedded Data
 # =================
 #
 # Method: LSB (Least Significant Bit)
@@ -125,7 +125,7 @@ Options:
 
 ### Metadata
 
-Stores data in a custom RIFF chunk (`vvwD`). Does not modify audio samples at all, but the chunk is visible to tools like `ffprobe`. Useful when audio fidelity is critical.
+Stores data in a custom RIFF chunk (`zimH`). Does not modify audio samples at all, but the chunk is visible to tools like `ffprobe`. Useful when audio fidelity is critical.
 
 ## Cryptography
 
@@ -135,15 +135,15 @@ Stores data in a custom RIFF chunk (`vvwD`). Does not modify audio samples at al
 
 Key files use a PEM-like format:
 ```
------BEGIN VVW PUBLIC KEY-----
+-----BEGIN ZIMHIDE PUBLIC KEY-----
 <base64 encoded key>
------END VVW PUBLIC KEY-----
+-----END ZIMHIDE PUBLIC KEY-----
 ```
 
 ## Embedded Data Format
 
 ```
-[4 bytes]  Magic: "VVW\x01"
+[4 bytes]  Magic: "ZIMH"
 [1 byte]   Flags (text, audio, signed, symmetric, asymmetric)
 [1 byte]   Method (0=LSB, 1=metadata, 2=spread)
 [4 bytes]  Payload length
@@ -157,16 +157,16 @@ Generate shell completions for your shell:
 
 ```bash
 # Bash
-vvw completions bash > ~/.local/share/bash-completion/completions/vvw
+zimhide completions bash > ~/.local/share/bash-completion/completions/zimhide
 
 # Zsh (add to fpath)
-vvw completions zsh > ~/.zfunc/_vvw
+zimhide completions zsh > ~/.zfunc/_zimhide
 
 # Fish
-vvw completions fish > ~/.config/fish/completions/vvw.fish
+zimhide completions fish > ~/.config/fish/completions/zimhide.fish
 
 # PowerShell
-vvw completions powershell >> $PROFILE
+zimhide completions powershell >> $PROFILE
 ```
 
 For zsh, ensure `~/.zfunc` is in your fpath. Add to `~/.zshrc`:

@@ -25,8 +25,8 @@ pub fn run(args: InspectArgs) -> Result<()> {
     let embedded = EmbeddedData::from_bytes(&data)?;
     let flags = &embedded.header.flags;
 
-    println!("VVW Embedded Data");
-    println!("=================");
+    println!("Zimhide Embedded Data");
+    println!("=====================");
     println!();
 
     // Method info
@@ -112,7 +112,7 @@ fn try_extract_with_info(path: &Path) -> Result<(Vec<u8>, StegoMethodType, usize
     let metadata_stego = MetadataSteganography::new();
     if let Ok(data) = metadata_stego.extract(path)
         && data.len() >= 4
-        && &data[0..4] == b"VVW\x01"
+        && &data[0..4] == b"ZIMH"
     {
         let capacity = metadata_stego.capacity(path)?;
         return Ok((data, StegoMethodType::Metadata, capacity));
@@ -122,10 +122,10 @@ fn try_extract_with_info(path: &Path) -> Result<(Vec<u8>, StegoMethodType, usize
     let lsb_stego = LsbSteganography::default();
     let data = lsb_stego.extract(path)?;
 
-    if data.len() >= 4 && &data[0..4] == b"VVW\x01" {
+    if data.len() >= 4 && &data[0..4] == b"ZIMH" {
         let capacity = lsb_stego.capacity(path)?;
         return Ok((data, StegoMethodType::Lsb, capacity));
     }
 
-    Err(anyhow!("No valid VVW data found in file"))
+    Err(anyhow!("No valid zimhide data found in file"))
 }

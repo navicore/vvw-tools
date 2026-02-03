@@ -91,7 +91,7 @@ pub fn run(args: DecodeArgs) -> Result<()> {
     }
 
     if payload.audio.is_some() {
-        eprintln!("Note: Audio content is embedded. Use 'vvw play' to extract/play it.");
+        eprintln!("Note: Audio content is embedded. Use 'zimhide play' to extract/play it.");
     }
 
     Ok(())
@@ -102,7 +102,7 @@ fn try_extract(args: &DecodeArgs) -> Result<Vec<u8>> {
     let metadata_stego = MetadataSteganography::new();
     if let Ok(data) = metadata_stego.extract(&args.input)
         && data.len() >= 4
-        && &data[0..4] == b"VVW\x01"
+        && &data[0..4] == b"ZIMH"
     {
         return Ok(data);
     }
@@ -115,12 +115,12 @@ fn try_extract(args: &DecodeArgs) -> Result<Vec<u8>> {
     let lsb_stego = LsbSteganography::new(options);
     let data = lsb_stego.extract(&args.input)?;
 
-    // Verify it's valid VVW data
-    if data.len() >= 4 && &data[0..4] == b"VVW\x01" {
+    // Verify it's valid zimhide data
+    if data.len() >= 4 && &data[0..4] == b"ZIMH" {
         return Ok(data);
     }
 
     Err(anyhow!(
-        "No valid VVW data found in file. The file may not contain embedded data, or you may need to specify --bits and --channels to match the encoding."
+        "No valid zimhide data found in file. The file may not contain embedded data, or you may need to specify --bits and --channels to match the encoding."
     ))
 }

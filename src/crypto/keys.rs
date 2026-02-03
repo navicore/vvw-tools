@@ -6,10 +6,10 @@ use std::fs;
 use std::path::Path;
 use x25519_dalek::{PublicKey as X25519Public, StaticSecret as X25519Secret};
 
-const PRIVATE_KEY_HEADER: &str = "-----BEGIN VVW PRIVATE KEY-----";
-const PRIVATE_KEY_FOOTER: &str = "-----END VVW PRIVATE KEY-----";
-const PUBLIC_KEY_HEADER: &str = "-----BEGIN VVW PUBLIC KEY-----";
-const PUBLIC_KEY_FOOTER: &str = "-----END VVW PUBLIC KEY-----";
+const PRIVATE_KEY_HEADER: &str = "-----BEGIN ZIMHIDE PRIVATE KEY-----";
+const PRIVATE_KEY_FOOTER: &str = "-----END ZIMHIDE PRIVATE KEY-----";
+const PUBLIC_KEY_HEADER: &str = "-----BEGIN ZIMHIDE PUBLIC KEY-----";
+const PUBLIC_KEY_FOOTER: &str = "-----END ZIMHIDE PUBLIC KEY-----";
 
 #[derive(Clone)]
 pub struct PrivateKey {

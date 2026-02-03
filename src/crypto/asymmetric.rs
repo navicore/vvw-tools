@@ -154,7 +154,7 @@ fn derive_key_encryption_key(shared_secret: &[u8]) -> [u8; KEY_SIZE] {
     // Use multiple rounds to fill the key
     for i in 0..4 {
         let mut hasher = DefaultHasher::new();
-        b"vvw-key-derivation".hash(&mut hasher);
+        b"zimhide-key-derivation".hash(&mut hasher);
         i.hash(&mut hasher);
         shared_secret.hash(&mut hasher);
         let hash = hasher.finish();

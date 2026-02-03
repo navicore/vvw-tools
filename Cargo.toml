@@ -1,18 +1,18 @@
 [package]
-name = "vvw"
+name = "zimhide"
 version = "0.1.0"
 edition = "2024"
-description = "WAV steganography CLI for embedding and extracting encrypted text/audio"
+description = "Zim Steganography Toolkit - WAV steganography CLI for embedding and extracting encrypted text/audio"
 license = "MIT"
-repository = "https://github.com/navicore/vvw-tools"
-homepage = "https://github.com/navicore/vvw-tools"
-documentation = "https://github.com/navicore/vvw-tools"
+repository = "https://github.com/navicore/zim-steganography-toolkit"
+homepage = "https://github.com/navicore/zim-steganography-toolkit"
+documentation = "https://github.com/navicore/zim-steganography-toolkit"
 readme = "README.md"
 keywords = ["steganography", "wav", "audio", "encryption", "cli"]
 categories = ["command-line-utilities", "cryptography", "multimedia::audio"]
 
 [[bin]]
-name = "vvw"
+name = "zimhide"
 path = "src/main.rs"
 
 [dependencies]

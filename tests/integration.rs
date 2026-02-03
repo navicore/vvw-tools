@@ -22,11 +22,11 @@ fn create_test_wav(path: &std::path::Path) {
     writer.finalize().unwrap();
 }
 
-fn vvw_binary() -> std::path::PathBuf {
+fn zimhide_binary() -> std::path::PathBuf {
     let mut path = std::env::current_exe().unwrap();
     path.pop(); // Remove test binary name
     path.pop(); // Remove deps
-    path.push("vvw");
+    path.push("zimhide");
     path
 }
 
@@ -39,7 +39,7 @@ fn test_basic_encode_decode_cycle() {
     create_test_wav(&input);
 
     // Encode
-    let status = Command::new(vvw_binary())
+    let status = Command::new(zimhide_binary())
         .args([
             "encode",
             input.to_str().unwrap(),
@@ -53,7 +53,7 @@ fn test_basic_encode_decode_cycle() {
     assert!(status.success(), "encode failed");
 
     // Decode
-    let output_result = Command::new(vvw_binary())
+    let output_result = Command::new(zimhide_binary())
         .args(["decode", output.to_str().unwrap()])
         .output()
         .unwrap();
@@ -72,7 +72,7 @@ fn test_symmetric_encryption_cycle() {
     create_test_wav(&input);
 
     // Encode with passphrase
-    let status = Command::new(vvw_binary())
+    let status = Command::new(zimhide_binary())
         .args([
             "encode",
             input.to_str().unwrap(),
@@ -88,7 +88,7 @@ fn test_symmetric_encryption_cycle() {
     assert!(status.success(), "encode with passphrase failed");
 
     // Decode with correct passphrase
-    let output_result = Command::new(vvw_binary())
+    let output_result = Command::new(zimhide_binary())
         .args([
             "decode",
             output.to_str().unwrap(),
@@ -106,7 +106,7 @@ fn test_symmetric_encryption_cycle() {
     assert_eq!(decoded.trim(), "Secret message");
 
     // Decode without passphrase should fail
-    let fail_result = Command::new(vvw_binary())
+    let fail_result = Command::new(zimhide_binary())
         .args(["decode", output.to_str().unwrap()])
         .output()
         .unwrap();
@@ -126,7 +126,7 @@ fn test_asymmetric_encryption_cycle() {
     create_test_wav(&input);
 
     // Generate keypair
-    let status = Command::new(vvw_binary())
+    let status = Command::new(zimhide_binary())
         .args(["keygen", "--output", keybase.to_str().unwrap()])
         .status()
         .unwrap();
@@ -138,7 +138,7 @@ fn test_asymmetric_encryption_cycle() {
     assert!(priv_key.exists(), "private key not created");
 
     // Encode with public key
-    let status = Command::new(vvw_binary())
+    let status = Command::new(zimhide_binary())
         .args([
             "encode",
             input.to_str().unwrap(),
@@ -154,7 +154,7 @@ fn test_asymmetric_encryption_cycle() {
     assert!(status.success(), "encode with public key failed");
 
     // Decode with private key
-    let output_result = Command::new(vvw_binary())
+    let output_result = Command::new(zimhide_binary())
         .args([
             "decode",
             output.to_str().unwrap(),
@@ -182,7 +182,7 @@ fn test_signed_message() {
     create_test_wav(&input);
 
     // Generate keypair
-    Command::new(vvw_binary())
+    Command::new(zimhide_binary())
         .args(["keygen", "--output", keybase.to_str().unwrap()])
         .status()
         .unwrap();
@@ -191,7 +191,7 @@ fn test_signed_message() {
     let priv_key = keybase.with_extension("priv");
 
     // Encode with signature
-    let status = Command::new(vvw_binary())
+    let status = Command::new(zimhide_binary())
         .args([
             "encode",
             input.to_str().unwrap(),
@@ -208,7 +208,7 @@ fn test_signed_message() {
     assert!(status.success(), "encode with signature failed");
 
     // Decode and verify
-    let output_result = Command::new(vvw_binary())
+    let output_result = Command::new(zimhide_binary())
         .args([
             "decode",
             output.to_str().unwrap(),
@@ -235,7 +235,7 @@ fn test_inspect_command() {
     create_test_wav(&input);
 
     // Encode
-    Command::new(vvw_binary())
+    Command::new(zimhide_binary())
         .args([
             "encode",
             input.to_str().unwrap(),
@@ -248,14 +248,14 @@ fn test_inspect_command() {
         .unwrap();
 
     // Inspect
-    let output_result = Command::new(vvw_binary())
+    let output_result = Command::new(zimhide_binary())
         .args(["inspect", output.to_str().unwrap()])
         .output()
         .unwrap();
     assert!(output_result.status.success(), "inspect failed");
 
     let inspect_output = String::from_utf8_lossy(&output_result.stdout);
-    assert!(inspect_output.contains("VVW Embedded Data"));
+    assert!(inspect_output.contains("Zimhide Embedded Data"));
     assert!(inspect_output.contains("Method: LSB"));
     assert!(inspect_output.contains("text"));
 }
@@ -269,7 +269,7 @@ fn test_metadata_method() {
     create_test_wav(&input);
 
     // Encode with metadata method
-    let status = Command::new(vvw_binary())
+    let status = Command::new(zimhide_binary())
         .args([
             "encode",
             input.to_str().unwrap(),
@@ -285,7 +285,7 @@ fn test_metadata_method() {
     assert!(status.success(), "encode with metadata method failed");
 
     // Decode
-    let output_result = Command::new(vvw_binary())
+    let output_result = Command::new(zimhide_binary())
         .args(["decode", output.to_str().unwrap()])
         .output()
         .unwrap();
@@ -295,7 +295,7 @@ fn test_metadata_method() {
     assert_eq!(decoded.trim(), "Metadata message");
 
     // Inspect should show metadata method
-    let inspect_result = Command::new(vvw_binary())
+    let inspect_result = Command::new(zimhide_binary())
         .args(["inspect", output.to_str().unwrap()])
         .output()
         .unwrap();

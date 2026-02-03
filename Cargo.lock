@@ -709,25 +709,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
-name = "vvw"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "argon2",
- "base64",
- "chacha20poly1305",
- "clap",
- "clap_complete",
- "ed25519-dalek",
- "hound",
- "rand",
- "tempfile",
- "thiserror",
- "which",
- "x25519-dalek",
-]
-
-[[package]]
 name = "wasi"
 version = "0.11.1+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -831,4 +812,23 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "zimhide"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "argon2",
+ "base64",
+ "chacha20poly1305",
+ "clap",
+ "clap_complete",
+ "ed25519-dalek",
+ "hound",
+ "rand",
+ "tempfile",
+ "thiserror",
+ "which",
+ "x25519-dalek",
 ]

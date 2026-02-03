@@ -1,8 +1,8 @@
-# VVW Roadmap
+# Zimhide Roadmap
 
 ## Overview
 
-VVW is a WAV steganography toolkit for embedding and extracting encrypted text and audio. This document outlines the implementation phases and current status.
+Zimhide (Zim Steganography Toolkit) is a WAV steganography toolkit for embedding and extracting encrypted text and audio. Part of the Zim tool family. This document outlines the implementation phases and current status.
 
 ---
 
@@ -19,7 +19,7 @@ VVW is a WAV steganography toolkit for embedding and extracting encrypted text a
 ### Crate Structure
 
 ```
-vvw/
+zimhide/
 ├── Cargo.toml
 ├── src/
 │   ├── main.rs              # CLI entry, clap setup
@@ -71,16 +71,16 @@ vvw/
 
 **Private key (`*.priv`):**
 ```
------BEGIN VVW PRIVATE KEY-----
+-----BEGIN ZIMHIDE PRIVATE KEY-----
 [base64 of 32-byte Ed25519 seed + 32-byte X25519 private]
------END VVW PRIVATE KEY-----
+-----END ZIMHIDE PRIVATE KEY-----
 ```
 
 **Public key (`*.pub`):**
 ```
------BEGIN VVW PUBLIC KEY-----
+-----BEGIN ZIMHIDE PUBLIC KEY-----
 [base64 of 32-byte Ed25519 public + 32-byte X25519 public]
------END VVW PUBLIC KEY-----
+-----END ZIMHIDE PUBLIC KEY-----
 ```
 
 ### Encryption Envelope
@@ -147,12 +147,12 @@ The `decompress_audio()` function should:
 
 ### RIFF Chunk Format
 
-Custom chunk ID: `vvwD` (lowercase = non-standard per RIFF spec)
+Custom chunk ID: `zimH` (lowercase = non-standard per RIFF spec)
 
 ```
-[4 bytes]  Chunk ID: "vvwD"
+[4 bytes]  Chunk ID: "zimH"
 [4 bytes]  Chunk size (little-endian)
-[N bytes]  VVW payload data
+[N bytes]  Zimhide payload data
 [0-1 byte] Padding (if odd size)
 ```
 
@@ -199,7 +199,7 @@ Advanced steganography method that spreads data below the noise floor across fre
 ### Header Structure
 
 ```
-[4 bytes]  Magic: "VVW\x01" (version 1)
+[4 bytes]  Magic: "ZIMH"
 [1 byte]   Flags:
            - bit 0: has text
            - bit 1: has audio
@@ -278,38 +278,38 @@ Located in `tests/integration.rs`. Covers:
 
 ```bash
 # Generate keys
-./target/release/vvw keygen --output test
+./target/release/zimhide keygen --output test
 
 # Basic encode/decode
-./target/release/vvw encode test.wav -o out.wav --message "hello"
-./target/release/vvw decode out.wav
+./target/release/zimhide encode test.wav -o out.wav --message "hello"
+./target/release/zimhide decode out.wav
 
 # Symmetric encryption
-./target/release/vvw encode test.wav -o out.wav --message "secret" --passphrase "puzzle"
-./target/release/vvw decode out.wav --passphrase "puzzle"
+./target/release/zimhide encode test.wav -o out.wav --message "secret" --passphrase "puzzle"
+./target/release/zimhide decode out.wav --passphrase "puzzle"
 
 # Asymmetric encryption
-./target/release/vvw encode test.wav -o out.wav --message "private" --encrypt-to test.pub
-./target/release/vvw decode out.wav --key test.priv
+./target/release/zimhide encode test.wav -o out.wav --message "private" --encrypt-to test.pub
+./target/release/zimhide decode out.wav --key test.priv
 
 # Signed message
-./target/release/vvw encode test.wav -o out.wav --message "verified" --sign --key test.priv
-./target/release/vvw decode out.wav --verify test.pub
+./target/release/zimhide encode test.wav -o out.wav --message "verified" --sign --key test.priv
+./target/release/zimhide decode out.wav --verify test.pub
 
 # Inspect
-./target/release/vvw inspect out.wav
+./target/release/zimhide inspect out.wav
 ```
 
 ---
 
 ## CLI Reference
 
-### vvw encode
+### zimhide encode
 
 ```
 Embed text or audio into a WAV file
 
-Usage: vvw encode [OPTIONS] --output <OUTPUT> <INPUT>
+Usage: zimhide encode [OPTIONS] --output <OUTPUT> <INPUT>
 
 Arguments:
   <INPUT>  Input WAV file
@@ -328,12 +328,12 @@ Options:
       --channels <CHANNELS>    left, right, or both (default: both)
 ```
 
-### vvw decode
+### zimhide decode
 
 ```
 Extract text content from a WAV file
 
-Usage: vvw decode [OPTIONS] <INPUT>
+Usage: zimhide decode [OPTIONS] <INPUT>
 
 Arguments:
   <INPUT>  Input WAV file with embedded data
@@ -346,12 +346,12 @@ Options:
       --channels <CHAN>    left, right, or both (default: both)
 ```
 
-### vvw play
+### zimhide play
 
 ```
 Extract and play embedded audio from a WAV file
 
-Usage: vvw play [OPTIONS] <INPUT>
+Usage: zimhide play [OPTIONS] <INPUT>
 
 Arguments:
   <INPUT>  Input WAV file with embedded audio
@@ -365,23 +365,23 @@ Options:
       --channels <CHANNELS>  left, right, or both (default: both)
 ```
 
-### vvw keygen
+### zimhide keygen
 
 ```
 Generate a keypair for encryption and signing
 
-Usage: vvw keygen [OPTIONS]
+Usage: zimhide keygen [OPTIONS]
 
 Options:
   -o, --output <PATH>  Output base path (creates .pub and .priv)
 ```
 
-### vvw inspect
+### zimhide inspect
 
 ```
 Inspect embedded content metadata without decrypting
 
-Usage: vvw inspect <INPUT>
+Usage: zimhide inspect <INPUT>
 
 Arguments:
   <INPUT>  Input WAV file to inspect

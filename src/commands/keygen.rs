@@ -34,16 +34,16 @@ pub fn run(args: KeygenArgs) -> Result<()> {
         pub_bytes.extend_from_slice(keypair.public.ed25519.as_bytes());
         pub_bytes.extend_from_slice(keypair.public.x25519.as_bytes());
 
-        println!("# VVW Keypair");
+        println!("# Zimhide Keypair");
         println!("# Fingerprint: {}", keypair.public.fingerprint());
         println!();
-        println!("-----BEGIN VVW PRIVATE KEY-----");
+        println!("-----BEGIN ZIMHIDE PRIVATE KEY-----");
         println!("{}", BASE64.encode(&priv_bytes));
-        println!("-----END VVW PRIVATE KEY-----");
+        println!("-----END ZIMHIDE PRIVATE KEY-----");
         println!();
-        println!("-----BEGIN VVW PUBLIC KEY-----");
+        println!("-----BEGIN ZIMHIDE PUBLIC KEY-----");
         println!("{}", BASE64.encode(&pub_bytes));
-        println!("-----END VVW PUBLIC KEY-----");
+        println!("-----END ZIMHIDE PUBLIC KEY-----");
     }
 
     Ok(())

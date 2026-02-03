@@ -1,4 +1,4 @@
-# VVW Build System
+# Zimhide Build System
 #
 # This is the SOURCE OF TRUTH for all build/test/lint operations.
 # GitHub Actions calls these recipes directly - no duplication!
@@ -9,9 +9,9 @@ default:
 
 # Build the release binary
 build:
-    @echo "Building vvw..."
+    @echo "Building zimhide..."
     cargo build --release
-    @echo "✅ Built: target/release/vvw"
+    @echo "✅ Built: target/release/zimhide"
 
 # Run all Rust tests (unit + integration)
 test:
@@ -83,9 +83,9 @@ doc:
 
 # Install to ~/.cargo/bin
 install:
-    @echo "Installing vvw..."
+    @echo "Installing zimhide..."
     cargo install --path .
-    @echo "✅ Installed to ~/.cargo/bin/vvw"
+    @echo "✅ Installed to ~/.cargo/bin/zimhide"
 
 # Check for outdated dependencies
 outdated:
