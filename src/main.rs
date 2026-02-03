@@ -12,7 +12,7 @@ mod wav;
 #[command(name = "vvw")]
 #[command(about = "WAV steganography toolkit for embedding and extracting encrypted content")]
 #[command(version)]
-struct Cli {
+pub struct Cli {
     #[command(subcommand)]
     command: Commands,
 }
@@ -33,6 +33,9 @@ enum Commands {
 
     /// Inspect embedded content metadata without decrypting
     Inspect(commands::inspect::InspectArgs),
+
+    /// Generate shell completions
+    Completions(commands::completions::CompletionsArgs),
 }
 
 fn main() -> Result<()> {
@@ -44,5 +47,9 @@ fn main() -> Result<()> {
         Commands::Play(args) => commands::play::run(args),
         Commands::Keygen(args) => commands::keygen::run(args),
         Commands::Inspect(args) => commands::inspect::run(args),
+        Commands::Completions(args) => {
+            commands::completions::run(args);
+            Ok(())
+        }
     }
 }

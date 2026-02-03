@@ -161,6 +161,30 @@ Key files use a PEM-like format:
 [64 bytes] Signature (if signed)
 ```
 
+## Shell Completions
+
+Generate shell completions for your shell:
+
+```bash
+# Bash
+vvw completions bash > ~/.local/share/bash-completion/completions/vvw
+
+# Zsh (add to fpath)
+vvw completions zsh > ~/.zfunc/_vvw
+
+# Fish
+vvw completions fish > ~/.config/fish/completions/vvw.fish
+
+# PowerShell
+vvw completions powershell >> $PROFILE
+```
+
+For zsh, ensure `~/.zfunc` is in your fpath. Add to `~/.zshrc`:
+```bash
+fpath=(~/.zfunc $fpath)
+autoload -Uz compinit && compinit
+```
+
 ## License
 
 MIT

@@ -1,3 +1,4 @@
+pub mod completions;
 pub mod decode;
 pub mod encode;
 pub mod inspect;
