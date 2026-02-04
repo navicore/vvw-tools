@@ -12,7 +12,7 @@ use std::path::Path;
 
 #[cfg(feature = "opus-compression")]
 mod opus_impl {
-    use super::*;
+    use super::{Context, Path, Result};
     use anyhow::bail;
     use hound::{SampleFormat, WavReader, WavSpec, WavWriter};
     use opus::{Application, Bitrate, Channels, Decoder, Encoder};
