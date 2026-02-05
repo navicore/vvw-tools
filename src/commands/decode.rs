@@ -66,7 +66,10 @@ pub fn run(args: DecodeArgs, verbosity: Verbosity) -> Result<()> {
         verify_signature(&embedded.payload, signature, &public_key)?;
         status!(verbosity, "Signature verified successfully");
     } else if flags.is_signed {
-        status!(verbosity, "Note: Message is signed. Use --verify to verify the signature.");
+        status!(
+            verbosity,
+            "Note: Message is signed. Use --verify to verify the signature."
+        );
     }
 
     // Decrypt payload
@@ -95,7 +98,10 @@ pub fn run(args: DecodeArgs, verbosity: Verbosity) -> Result<()> {
     }
 
     if payload.audio.is_some() {
-        status!(verbosity, "Note: Audio content is embedded. Use 'zimhide play' to extract/play it.");
+        status!(
+            verbosity,
+            "Note: Audio content is embedded. Use 'zimhide play' to extract/play it."
+        );
     }
 
     Ok(())

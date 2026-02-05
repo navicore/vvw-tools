@@ -52,7 +52,11 @@ pub fn run(args: PlayArgs, verbosity: Verbosity) -> Result<()> {
     let flags = &embedded.header.flags;
 
     verbose!(verbosity, "Format version: {}", embedded.header.version);
-    verbose!(verbosity, "Audio data size: {} bytes", embedded.payload.len());
+    verbose!(
+        verbosity,
+        "Audio data size: {} bytes",
+        embedded.payload.len()
+    );
 
     if !flags.has_audio {
         return Err(anyhow!("No audio content is embedded in this file"));

@@ -1,7 +1,7 @@
+use crate::Verbosity;
 use crate::crypto::asymmetric::recipient_count;
 use crate::format::EmbeddedData;
 use crate::stego::{LsbSteganography, MetadataSteganography, StegoMethod, StegoMethodType};
-use crate::Verbosity;
 use anyhow::{Result, anyhow};
 use clap::Args;
 use std::fmt::Write;

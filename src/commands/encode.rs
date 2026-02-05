@@ -189,13 +189,17 @@ pub fn run(args: EncodeArgs, verbosity: Verbosity) -> Result<()> {
     );
 
     verbose!(verbosity, "Method: {:?}", args.method);
-    verbose!(verbosity, "Encryption: {}", if flags.symmetric_encryption {
-        "symmetric"
-    } else if flags.asymmetric_encryption {
-        "asymmetric"
-    } else {
-        "none"
-    });
+    verbose!(
+        verbosity,
+        "Encryption: {}",
+        if flags.symmetric_encryption {
+            "symmetric"
+        } else if flags.asymmetric_encryption {
+            "asymmetric"
+        } else {
+            "none"
+        }
+    );
     verbose!(verbosity, "Signed: {}", flags.is_signed);
 
     Ok(())
