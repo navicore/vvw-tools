@@ -1,4 +1,5 @@
 use crate::crypto::keys::Keypair;
+use crate::{Verbosity, status};
 use anyhow::Result;
 use base64::{Engine, engine::general_purpose::STANDARD as BASE64};
 use clap::Args;
@@ -11,7 +12,7 @@ pub struct KeygenArgs {
     pub output: Option<PathBuf>,
 }
 
-pub fn run(args: KeygenArgs) -> Result<()> {
+pub fn run(args: KeygenArgs, verbosity: Verbosity) -> Result<()> {
     let keypair = Keypair::generate();
 
     if let Some(base_path) = args.output {
@@ -20,10 +21,10 @@ pub fn run(args: KeygenArgs) -> Result<()> {
         let pub_path = base_path.with_extension("pub");
         let priv_path = base_path.with_extension("priv");
 
-        eprintln!("Generated keypair:");
-        eprintln!("  Public key:  {}", pub_path.display());
-        eprintln!("  Private key: {}", priv_path.display());
-        eprintln!("  Fingerprint: {}", keypair.public.fingerprint());
+        status!(verbosity, "Generated keypair:");
+        status!(verbosity, "  Public key:  {}", pub_path.display());
+        status!(verbosity, "  Private key: {}", priv_path.display());
+        status!(verbosity, "  Fingerprint: {}", keypair.public.fingerprint());
     } else {
         // Output to stdout in a format that can be redirected
         let mut priv_bytes = Vec::with_capacity(64);

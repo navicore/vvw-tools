@@ -6,13 +6,24 @@ mod commands;
 mod crypto;
 mod format;
 mod stego;
+mod verbosity;
 mod wav;
+
+pub use verbosity::Verbosity;
 
 #[derive(Parser)]
 #[command(name = "zimhide")]
 #[command(about = "Zim Steganography Toolkit - embed and extract encrypted content in WAV files")]
 #[command(version)]
 pub struct Cli {
+    /// Suppress all output except errors and requested content
+    #[arg(short, long, global = true)]
+    pub quiet: bool,
+
+    /// Show detailed output
+    #[arg(short, long, global = true, conflicts_with = "quiet")]
+    pub verbose: bool,
+
     #[command(subcommand)]
     command: Commands,
 }
@@ -40,13 +51,14 @@ enum Commands {
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
+    let verbosity = Verbosity::from_flags(cli.quiet, cli.verbose);
 
     match cli.command {
-        Commands::Encode(args) => commands::encode::run(args),
-        Commands::Decode(args) => commands::decode::run(args),
-        Commands::Play(args) => commands::play::run(args),
-        Commands::Keygen(args) => commands::keygen::run(args),
-        Commands::Inspect(args) => commands::inspect::run(args),
+        Commands::Encode(args) => commands::encode::run(args, verbosity),
+        Commands::Decode(args) => commands::decode::run(args, verbosity),
+        Commands::Play(args) => commands::play::run(args, verbosity),
+        Commands::Keygen(args) => commands::keygen::run(args, verbosity),
+        Commands::Inspect(args) => commands::inspect::run(args, verbosity),
         Commands::Completions(args) => {
             commands::completions::run(args);
             Ok(())

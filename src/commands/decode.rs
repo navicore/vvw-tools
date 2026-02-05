@@ -4,6 +4,7 @@ use crate::crypto::{
 use crate::format::{EmbeddedData, Payload};
 use crate::stego::traits::{ChannelMode, EmbedOptions};
 use crate::stego::{LsbSteganography, MetadataSteganography, StegoMethod};
+use crate::{Verbosity, status, verbose};
 use anyhow::{Result, anyhow};
 use clap::Args;
 use std::path::PathBuf;
@@ -34,7 +35,7 @@ pub struct DecodeArgs {
     pub channels: ChannelMode,
 }
 
-pub fn run(args: DecodeArgs) -> Result<()> {
+pub fn run(args: DecodeArgs, verbosity: Verbosity) -> Result<()> {
     if !args.input.exists() {
         return Err(anyhow!(
             "Input file does not exist: {}",
@@ -49,6 +50,9 @@ pub fn run(args: DecodeArgs) -> Result<()> {
     let embedded = EmbeddedData::from_bytes(&data)?;
     let flags = &embedded.header.flags;
 
+    verbose!(verbosity, "Format version: {}", embedded.header.version);
+    verbose!(verbosity, "Payload size: {} bytes", embedded.payload.len());
+
     // Verify signature if requested
     if let Some(ref verify_path) = args.verify {
         if !flags.is_signed {
@@ -60,9 +64,9 @@ pub fn run(args: DecodeArgs) -> Result<()> {
             .as_ref()
             .ok_or_else(|| anyhow!("No signature found"))?;
         verify_signature(&embedded.payload, signature, &public_key)?;
-        eprintln!("Signature verified successfully");
+        status!(verbosity, "Signature verified successfully");
     } else if flags.is_signed {
-        eprintln!("Note: Message is signed. Use --verify to verify the signature.");
+        status!(verbosity, "Note: Message is signed. Use --verify to verify the signature.");
     }
 
     // Decrypt payload
@@ -91,7 +95,7 @@ pub fn run(args: DecodeArgs) -> Result<()> {
     }
 
     if payload.audio.is_some() {
-        eprintln!("Note: Audio content is embedded. Use 'zimhide play' to extract/play it.");
+        status!(verbosity, "Note: Audio content is embedded. Use 'zimhide play' to extract/play it.");
     }
 
     Ok(())
