@@ -107,33 +107,18 @@ For each recipient:
 
 ---
 
-## Phase 3: Audio Embedding 🔄
+## Phase 3: Audio Embedding ✅
 
-**Status: Partially Complete**
+**Status: Complete**
 
 - [x] Basic audio embedding (raw WAV bytes)
 - [x] Audio extraction
 - [x] `play` command with system player detection
-- [ ] Opus compression for embedded audio
-- [ ] Opus decompression on extraction
-
-### Planned Implementation
-
-Add Opus codec support for efficient audio embedding:
-
-```toml
-# Add to Cargo.toml
-opus = "0.3"  # Or audiopus
-```
-
-The `compress_audio()` function in `src/audio/compress.rs` should:
-1. Read input WAV file
-2. Compress to Opus format
-3. Return compressed bytes
-
-The `decompress_audio()` function should:
-1. Decompress Opus data
-2. Write to WAV file
+- [x] Opus compression for embedded audio (~10x compression)
+- [x] Opus decompression on extraction
+- [x] Feature flag for optional Opus (`--no-default-features` for raw WAV fallback)
+- [x] Protocol documentation (PROTOCOL.md)
+- [x] Version byte in format for future evolution
 
 ---
 
@@ -165,7 +150,7 @@ Custom chunk ID: `zimH` (lowercase = non-standard per RIFF spec)
 
 - [ ] Better error messages with context
 - [ ] Progress indicators for large files
-- [ ] `--quiet` and `--verbose` flags
+- [x] `--quiet` and `--verbose` flags
 - [x] Shell completions (bash, zsh, fish, powershell, elvish)
 - [ ] Man page generation
 - [ ] More comprehensive test coverage
@@ -197,10 +182,13 @@ Advanced steganography method that spreads data below the noise floor across fre
 
 ## Embedded Data Format
 
+See [PROTOCOL.md](../PROTOCOL.md) for complete byte-level documentation.
+
 ### Header Structure
 
 ```
 [4 bytes]  Magic: "ZIMH"
+[1 byte]   Version (currently 1)
 [1 byte]   Flags:
            - bit 0: has text
            - bit 1: has audio
@@ -240,9 +228,7 @@ anyhow = "1"                   # Error handling
 rand = "0.8"                   # Random number generation
 tempfile = "3"                 # Temporary files for playback
 which = "7"                    # Find system audio player
-
-# Future: for embedded audio compression
-# opus = "0.3"
+opus = { version = "0.3", optional = true }  # Audio compression (default feature)
 ```
 
 ---

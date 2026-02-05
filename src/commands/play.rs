@@ -2,6 +2,7 @@ use crate::crypto::{PrivateKey, decrypt_asymmetric, decrypt_symmetric};
 use crate::format::{EmbeddedData, Payload};
 use crate::stego::traits::{ChannelMode, EmbedOptions};
 use crate::stego::{LsbSteganography, MetadataSteganography, StegoMethod};
+use crate::{Verbosity, status, verbose};
 use anyhow::{Result, anyhow};
 use clap::Args;
 use std::path::PathBuf;
@@ -37,7 +38,7 @@ pub struct PlayArgs {
     pub channels: ChannelMode,
 }
 
-pub fn run(args: PlayArgs) -> Result<()> {
+pub fn run(args: PlayArgs, verbosity: Verbosity) -> Result<()> {
     if !args.input.exists() {
         return Err(anyhow!(
             "Input file does not exist: {}",
@@ -49,6 +50,13 @@ pub fn run(args: PlayArgs) -> Result<()> {
     let data = try_extract(&args)?;
     let embedded = EmbeddedData::from_bytes(&data)?;
     let flags = &embedded.header.flags;
+
+    verbose!(verbosity, "Format version: {}", embedded.header.version);
+    verbose!(
+        verbosity,
+        "Audio data size: {} bytes",
+        embedded.payload.len()
+    );
 
     if !flags.has_audio {
         return Err(anyhow!("No audio content is embedded in this file"));
@@ -81,7 +89,7 @@ pub fn run(args: PlayArgs) -> Result<()> {
     // Output to file or play
     if let Some(ref output_path) = args.extract_to {
         crate::audio::decompress_audio(&audio_data, output_path)?;
-        eprintln!("Extracted audio to: {}", output_path.display());
+        status!(verbosity, "Extracted audio to: {}", output_path.display());
     } else {
         // Create temp file and play
         let temp_dir = tempfile::tempdir()?;
@@ -90,11 +98,11 @@ pub fn run(args: PlayArgs) -> Result<()> {
 
         // Find and run player
         let player = find_player(&args.player)?;
-        eprintln!("Playing with: {}", player);
+        status!(verbosity, "Playing with: {}", player);
 
-        let status = Command::new(&player).arg(&temp_path).status()?;
+        let player_status = Command::new(&player).arg(&temp_path).status()?;
 
-        if !status.success() {
+        if !player_status.success() {
             return Err(anyhow!("Player exited with error"));
         }
     }

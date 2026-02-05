@@ -2,6 +2,7 @@ use crate::crypto::{PrivateKey, PublicKey, encrypt_asymmetric, encrypt_symmetric
 use crate::format::{EmbeddedData, Flags, Header, Payload};
 use crate::stego::traits::{ChannelMode, EmbedOptions};
 use crate::stego::{LsbSteganography, MetadataSteganography, StegoMethod, StegoMethodType};
+use crate::{Verbosity, status, verbose};
 use anyhow::{Result, anyhow};
 use clap::Args;
 use std::fs;
@@ -64,7 +65,7 @@ pub struct EncodeArgs {
     pub channels: ChannelMode,
 }
 
-pub fn run(args: EncodeArgs) -> Result<()> {
+pub fn run(args: EncodeArgs, verbosity: Verbosity) -> Result<()> {
     // Validate input file exists
     if !args.input.exists() {
         return Err(anyhow!(
@@ -179,12 +180,27 @@ pub fn run(args: EncodeArgs) -> Result<()> {
     stego.embed(&args.input, &args.output, &data_bytes)?;
 
     let capacity_used = (data_bytes.len() as f64 / capacity as f64) * 100.0;
-    eprintln!(
+    status!(
+        verbosity,
         "Embedded {} bytes into {} (capacity: {:.1}%)",
         data_bytes.len(),
         args.output.display(),
         capacity_used
     );
+
+    verbose!(verbosity, "Method: {:?}", args.method);
+    verbose!(
+        verbosity,
+        "Encryption: {}",
+        if flags.symmetric_encryption {
+            "symmetric"
+        } else if flags.asymmetric_encryption {
+            "asymmetric"
+        } else {
+            "none"
+        }
+    );
+    verbose!(verbosity, "Signed: {}", flags.is_signed);
 
     Ok(())
 }

@@ -1,3 +1,4 @@
+use crate::Verbosity;
 use crate::crypto::asymmetric::recipient_count;
 use crate::format::EmbeddedData;
 use crate::stego::{LsbSteganography, MetadataSteganography, StegoMethod, StegoMethodType};
@@ -12,7 +13,7 @@ pub struct InspectArgs {
     pub input: PathBuf,
 }
 
-pub fn run(args: InspectArgs) -> Result<()> {
+pub fn run(args: InspectArgs, _verbosity: Verbosity) -> Result<()> {
     if !args.input.exists() {
         return Err(anyhow!(
             "Input file does not exist: {}",
