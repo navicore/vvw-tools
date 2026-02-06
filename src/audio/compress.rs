@@ -100,9 +100,10 @@ mod opus_impl {
         output.extend(&(frame_count as u16).to_le_bytes());
 
         // Encode frames with progress
+        // MAX_PACKET_SIZE: Opus spec allows up to ~1275 bytes at typical bitrates,
+        // but we use 4000 to handle edge cases with very high bitrates or unusual frames.
         let mut packet = [0u8; MAX_PACKET_SIZE];
-        let progress = Progress::new(frame_count as u64, verbosity);
-        progress.set_message("Compressing audio...");
+        let progress = Progress::new(frame_count as u64, "Compressing audio...", verbosity);
 
         for chunk in samples.chunks(samples_per_frame) {
             // Pad last frame with zeros if needed
@@ -155,8 +156,7 @@ mod opus_impl {
         // Buffer for decoded PCM (max Opus frame is 120ms = 5760 samples/channel)
         let mut pcm = vec![0i16; 5760 * channel_count as usize];
 
-        let progress = Progress::new(frame_count as u64, verbosity);
-        progress.set_message("Decompressing audio...");
+        let progress = Progress::new(frame_count as u64, "Decompressing audio...", verbosity);
 
         for _ in 0..frame_count {
             if offset + 2 > data.len() {

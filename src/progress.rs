@@ -1,9 +1,14 @@
 //! Progress indicators for long-running operations.
 //!
 //! Respects verbosity settings - no progress in quiet mode.
+//! Only shows progress for operations with enough work to warrant it.
 
 use crate::Verbosity;
 use indicatif::{ProgressBar, ProgressStyle};
+
+/// Minimum number of items before showing a progress bar.
+/// Below this threshold, progress is not shown to avoid UI flicker for fast operations.
+const MIN_ITEMS_FOR_PROGRESS: u64 = 25;
 
 /// A progress bar that respects verbosity settings.
 pub struct Progress {
@@ -11,35 +16,22 @@ pub struct Progress {
 }
 
 impl Progress {
-    /// Create a new progress bar with known total.
-    pub fn new(total: u64, verbosity: Verbosity) -> Self {
-        let bar = if verbosity.show_status() {
+    /// Create a new progress bar with known total and initial message.
+    ///
+    /// Progress is only shown if:
+    /// - Verbosity is not Quiet
+    /// - Total items >= MIN_ITEMS_FOR_PROGRESS (to avoid flicker on fast operations)
+    pub fn new(total: u64, message: &str, verbosity: Verbosity) -> Self {
+        let bar = if verbosity.show_status() && total >= MIN_ITEMS_FOR_PROGRESS {
             let pb = ProgressBar::new(total);
             pb.set_style(
                 ProgressStyle::with_template(
                     "{spinner:.green} [{bar:30.cyan/blue}] {pos}/{len} {msg}",
                 )
-                .unwrap()
+                .expect("hardcoded progress template should be valid")
                 .progress_chars("#>-"),
             );
-            Some(pb)
-        } else {
-            None
-        };
-        Self { bar }
-    }
-
-    /// Create a spinner for unknown-length operations.
-    pub fn spinner(msg: &str, verbosity: Verbosity) -> Self {
-        let bar = if verbosity.show_status() {
-            let pb = ProgressBar::new_spinner();
-            pb.set_style(
-                ProgressStyle::with_template("{spinner:.green} {msg}")
-                    .unwrap()
-                    .tick_chars("⠁⠂⠄⡀⢀⠠⠐⠈ "),
-            );
-            pb.set_message(msg.to_string());
-            pb.enable_steady_tick(std::time::Duration::from_millis(100));
+            pb.set_message(message.to_string());
             Some(pb)
         } else {
             None
@@ -54,24 +46,11 @@ impl Progress {
         }
     }
 
-    /// Set the current position.
-    pub fn set_position(&self, pos: u64) {
-        if let Some(ref bar) = self.bar {
-            bar.set_position(pos);
-        }
-    }
-
     /// Set the message shown on the progress bar.
+    #[allow(dead_code)]
     pub fn set_message(&self, msg: impl Into<String>) {
         if let Some(ref bar) = self.bar {
             bar.set_message(msg.into());
-        }
-    }
-
-    /// Finish the progress bar with a message.
-    pub fn finish_with_message(&self, msg: impl Into<String>) {
-        if let Some(ref bar) = self.bar {
-            bar.finish_with_message(msg.into());
         }
     }
 
