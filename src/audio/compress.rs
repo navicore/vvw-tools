@@ -3,6 +3,7 @@
 //! With the `opus-compression` feature (default): Uses Opus codec at 48kHz for ~10x compression.
 //! Without the feature: Embeds raw WAV bytes (larger but no libopus dependency).
 
+use crate::{Progress, Verbosity};
 use anyhow::{Context, Result};
 use std::path::Path;
 
@@ -12,7 +13,7 @@ use std::path::Path;
 
 #[cfg(feature = "opus-compression")]
 mod opus_impl {
-    use super::{Context, Path, Result};
+    use super::{Context, Path, Progress, Result, Verbosity};
     use anyhow::bail;
     use hound::{SampleFormat, WavReader, WavSpec, WavWriter};
     use opus::{Application, Bitrate, Channels, Decoder, Encoder};
@@ -33,7 +34,7 @@ mod opus_impl {
     ///
     /// Returns a compact binary representation with minimal framing overhead.
     /// Input must be 48kHz, 16-bit, mono or stereo.
-    pub fn compress_audio(path: &Path) -> Result<Vec<u8>> {
+    pub fn compress_audio(path: &Path, verbosity: Verbosity) -> Result<Vec<u8>> {
         let reader = WavReader::open(path)
             .with_context(|| format!("Failed to open audio file: {}", path.display()))?;
 
@@ -98,8 +99,11 @@ mod opus_impl {
         output.extend(&spec.channels.to_le_bytes());
         output.extend(&(frame_count as u16).to_le_bytes());
 
-        // Encode frames
+        // Encode frames with progress
+        // MAX_PACKET_SIZE: Opus spec allows up to ~1275 bytes at typical bitrates,
+        // but we use 4000 to handle edge cases with very high bitrates or unusual frames.
         let mut packet = [0u8; MAX_PACKET_SIZE];
+        let progress = Progress::new(frame_count as u64, "Compressing audio...", verbosity);
 
         for chunk in samples.chunks(samples_per_frame) {
             // Pad last frame with zeros if needed
@@ -118,13 +122,15 @@ mod opus_impl {
             // Write frame size (u16) and packet data
             output.extend(&(len as u16).to_le_bytes());
             output.extend(&packet[..len]);
+            progress.inc(1);
         }
 
+        progress.finish_and_clear();
         Ok(output)
     }
 
     /// Decompress Opus data back to a WAV file.
-    pub fn decompress_audio(data: &[u8], output_path: &Path) -> Result<()> {
+    pub fn decompress_audio(data: &[u8], output_path: &Path, verbosity: Verbosity) -> Result<()> {
         if data.len() < HEADER_SIZE {
             bail!("Invalid Opus data: too short for header");
         }
@@ -143,12 +149,14 @@ mod opus_impl {
         // Create Opus decoder
         let mut decoder = Decoder::new(48000, channels).context("Failed to create Opus decoder")?;
 
-        // Decode all frames
+        // Decode all frames with progress
         let mut samples: Vec<i16> = Vec::new();
         let mut offset = HEADER_SIZE;
 
         // Buffer for decoded PCM (max Opus frame is 120ms = 5760 samples/channel)
         let mut pcm = vec![0i16; 5760 * channel_count as usize];
+
+        let progress = Progress::new(frame_count as u64, "Decompressing audio...", verbosity);
 
         for _ in 0..frame_count {
             if offset + 2 > data.len() {
@@ -168,7 +176,10 @@ mod opus_impl {
 
             samples.extend(&pcm[..decoded * channel_count as usize]);
             offset += frame_len;
+            progress.inc(1);
         }
+
+        progress.finish_and_clear();
 
         // Write WAV file
         let spec = WavSpec {
@@ -202,13 +213,13 @@ mod raw_impl {
     use super::*;
 
     /// Read raw WAV bytes (no compression).
-    pub fn compress_audio(path: &Path) -> Result<Vec<u8>> {
+    pub fn compress_audio(path: &Path, _verbosity: Verbosity) -> Result<Vec<u8>> {
         std::fs::read(path)
             .with_context(|| format!("Failed to read audio file: {}", path.display()))
     }
 
     /// Write raw WAV bytes to file.
-    pub fn decompress_audio(data: &[u8], output_path: &Path) -> Result<()> {
+    pub fn decompress_audio(data: &[u8], output_path: &Path, _verbosity: Verbosity) -> Result<()> {
         std::fs::write(output_path, data)
             .with_context(|| format!("Failed to write audio file: {}", output_path.display()))
     }
@@ -262,8 +273,8 @@ mod tests {
 
         create_test_wav(&input, 1, 500);
 
-        let compressed = compress_audio(&input).unwrap();
-        decompress_audio(&compressed, &output).unwrap();
+        let compressed = compress_audio(&input, Verbosity::Quiet).unwrap();
+        decompress_audio(&compressed, &output, Verbosity::Quiet).unwrap();
 
         // Verify output is a valid WAV
         let reader = hound::WavReader::open(&output).unwrap();
@@ -280,8 +291,8 @@ mod tests {
 
         create_test_wav(&input, 2, 500);
 
-        let compressed = compress_audio(&input).unwrap();
-        decompress_audio(&compressed, &output).unwrap();
+        let compressed = compress_audio(&input, Verbosity::Quiet).unwrap();
+        decompress_audio(&compressed, &output, Verbosity::Quiet).unwrap();
 
         let reader = hound::WavReader::open(&output).unwrap();
         let spec = reader.spec();
@@ -297,7 +308,7 @@ mod tests {
         create_test_wav(&input, 2, 1000);
 
         let original_size = std::fs::metadata(&input).unwrap().len();
-        let compressed = compress_audio(&input).unwrap();
+        let compressed = compress_audio(&input, Verbosity::Quiet).unwrap();
 
         // Should achieve significant compression (expect ~10x)
         let ratio = original_size as f64 / compressed.len() as f64;
@@ -327,7 +338,7 @@ mod tests {
         }
         writer.finalize().unwrap();
 
-        let result = compress_audio(&input);
+        let result = compress_audio(&input, Verbosity::Quiet);
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("48kHz"));
     }
@@ -348,8 +359,8 @@ mod tests_no_opus {
         let test_data = b"RIFF\x00\x00\x00\x00WAVEfmt test data";
         std::fs::write(&input, test_data).unwrap();
 
-        let compressed = compress_audio(&input).unwrap();
-        decompress_audio(&compressed, &output).unwrap();
+        let compressed = compress_audio(&input, Verbosity::Quiet).unwrap();
+        decompress_audio(&compressed, &output, Verbosity::Quiet).unwrap();
 
         let result = std::fs::read(&output).unwrap();
         assert_eq!(result, test_data);

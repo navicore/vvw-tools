@@ -5,10 +5,12 @@ mod audio;
 mod commands;
 mod crypto;
 mod format;
+mod progress;
 mod stego;
 mod verbosity;
 mod wav;
 
+pub use progress::Progress;
 pub use verbosity::Verbosity;
 
 #[derive(Parser)]

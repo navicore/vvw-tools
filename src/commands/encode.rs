@@ -85,7 +85,7 @@ pub fn run(args: EncodeArgs, verbosity: Verbosity) -> Result<()> {
 
     // Get audio content
     let audio = if let Some(ref path) = args.audio {
-        Some(crate::audio::compress_audio(path)?)
+        Some(crate::audio::compress_audio(path, verbosity)?)
     } else {
         None
     };
