@@ -88,13 +88,13 @@ pub fn run(args: PlayArgs, verbosity: Verbosity) -> Result<()> {
 
     // Output to file or play
     if let Some(ref output_path) = args.extract_to {
-        crate::audio::decompress_audio(&audio_data, output_path)?;
+        crate::audio::decompress_audio(&audio_data, output_path, verbosity)?;
         status!(verbosity, "Extracted audio to: {}", output_path.display());
     } else {
         // Create temp file and play
         let temp_dir = tempfile::tempdir()?;
         let temp_path = temp_dir.path().join("extracted.wav");
-        crate::audio::decompress_audio(&audio_data, &temp_path)?;
+        crate::audio::decompress_audio(&audio_data, &temp_path, verbosity)?;
 
         // Find and run player
         let player = find_player(&args.player)?;

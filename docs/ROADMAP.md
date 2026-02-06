@@ -149,7 +149,7 @@ Custom chunk ID: `zimH` (lowercase = non-standard per RIFF spec)
 **Status: Partially Complete**
 
 - [x] Better error messages with context
-- [ ] Progress indicators for large files
+- [x] Progress indicators for large files
 - [x] `--quiet` and `--verbose` flags
 - [x] Shell completions (bash, zsh, fish, powershell, elvish)
 - [ ] Man page generation

@@ -34,3 +34,4 @@ rand = "0.8"
 tempfile = "3"
 which = "7"
 opus = { version = "0.3", optional = true }
+indicatif = "0.17"
